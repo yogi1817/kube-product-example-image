@@ -6,3 +6,5 @@
 5. Loadbalancer
 6. ExternalIP vs svc name
 7. 
+
+kubectl rollout restart deployment product-deployment

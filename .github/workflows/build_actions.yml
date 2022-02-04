@@ -1,0 +1,38 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ develop, main ]
+
+jobs:
+  build-local:
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop'}}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Java 1.11
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+
+      - name: Setup Maven 3.8.2
+        uses: stCarolas/setup-maven@v4.2
+        with:
+          maven-version: 3.8.2
+
+      - name: 'Run mvn'
+        shell: bash
+        run: |
+          # If your function app project is not located in your repository's root
+          # Please change your directory for maven build in pushd
+          pushd ./
+          mvn clean package
+          popd
+
+      - name: Build the Docker image
+        run: docker build --file Dockerfile --tag kube-product-example-image .
+
+      - name: Docker Push
+        run: docker push docker.io/kube-product-example-image
